@@ -1,4 +1,5 @@
 import processTimeSeries from './processTimeSeries.js'
+import generator from './generator.js'
 
 const d = document
 
@@ -34,12 +35,20 @@ const worker = new Worker('worker.js')
 
 const iterators = {
 	native: timeSeries => processTimeSeries(...timeSeries),
+
 	worker: async timeSeries => {
 		const postData = await JSON.stringify(timeSeries)
 
 		await worker.postMessage(postData)
 
 		return new Promise(res => (worker.onmessage = e => res(e.data)))
+	},
+
+	generator: timeSeries => {
+
+		const result = generator(...timeSeries)
+
+		return result
 	},
 }
 
